@@ -52,24 +52,24 @@ def generate_dummy_data_from_summary(summary, n_rows=100):
     dummy_df = pd.DataFrame(dummy_data)
     return dummy_df
 
-# Example usage with an existing DataFrame `df`
-from summarise_dataframe import summarize_dataframe
+# # Example usage with an existing DataFrame `df`
+# from summarise_dataframe import summarize_dataframe
 
-df = pd.DataFrame({
-    'x': np.random.normal(10, 2, 50),
-    'y': np.random.choice(['A', 'B', 'C'], 50),
-    'z': np.random.randint(1, 10, 50),
-    'is_active': np.random.choice([True, False], 50),
-    'date': pd.date_range('2020-01-01', periods=50, freq='D')
-})
-# Introduce some missing values for testing
-df.loc[df.sample(frac=0.2).index, 'x'] = np.nan
-df.loc[df.sample(frac=0.1).index, 'y'] = np.nan
+# df = pd.DataFrame({
+#     'x': np.random.normal(10, 2, 50),
+#     'y': np.random.choice(['A', 'B', 'C'], 50),
+#     'z': np.random.randint(1, 10, 50),
+#     'is_active': np.random.choice([True, False], 50),
+#     'date': pd.date_range('2020-01-01', periods=50, freq='D')
+# })
+# # Introduce some missing values for testing
+# df.loc[df.sample(frac=0.2).index, 'x'] = np.nan
+# df.loc[df.sample(frac=0.1).index, 'y'] = np.nan
 
-# Step 1: Summarize the DataFrame
-summary_df = summarize_dataframe(df)
-print(summary_df)
+# # Step 1: Summarize the DataFrame
+# summary_df = summarize_dataframe(df)
+# print(summary_df)
 
-# Step 2: Generate dummy data from the summary
-dummy_df = generate_dummy_data_from_summary(summary_df, n_rows=100)
-print(dummy_df.head())
+# # Step 2: Generate dummy data from the summary
+# dummy_df = generate_dummy_data_from_summary(summary_df, n_rows=100)
+# print(dummy_df.head())
