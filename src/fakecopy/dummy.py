@@ -111,9 +111,11 @@ class DummyDF:
                 col_summary['max'] = df[column].max()
             
             elif isinstance(dtype, pd.CategoricalDtype) or pd.api.types.is_object_dtype(dtype):
-                unique_vals = df[column].dropna().unique()
-                col_summary['unique_values'] = unique_vals
-                col_summary['frequencies'] = df[column].value_counts(normalize=True).to_dict()
+                value_counts = df[column].value_counts(normalize=True)
+                if len(value_counts) > 100:
+                    value_counts = value_counts[:100]
+                col_summary['unique_values'] = value_counts.index.tolist()
+                col_summary['frequencies'] = value_counts.to_dict()
             
             elif pd.api.types.is_bool_dtype(dtype):
                 col_summary['unique_values'] = [True, False]
@@ -147,6 +149,8 @@ class DummyDF:
             
             elif 'object' in dtype or 'category' in dtype:
                 categories = list(row['frequencies'].keys())
+                if len(categories) > 100:
+                    categories = categories[:100]
                 probabilities = list(row['frequencies'].values())
                 dummy_data[column] = np.random.choice(categories, size=n_rows, p=probabilities)
             
