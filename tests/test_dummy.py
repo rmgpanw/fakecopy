@@ -40,3 +40,30 @@ class TestGenerateDummyDataFromSummary:
 
         for column in df.columns:
             assert dummy_df[column].isna().mean() <= summary_df.loc[summary_df['column'] == column, 'na_proportion'].values[0]
+
+class TestDummyDFInitialization:
+    
+    @pytest.fixture(scope="class")
+    def df(self):
+        return _create_test_dummy_data(seed=42)
+    
+    @pytest.fixture(scope="class")
+    def csv_file(self, tmp_path_factory):
+        df = _create_test_dummy_data(seed=42)
+        csv_file = tmp_path_factory.mktemp("data") / "dummy_data.csv"
+        df.to_csv(csv_file, index=False)
+        return csv_file
+
+    def test_initialization_with_dataframe(self, df):
+        df_utils = DummyDF(data=df)
+        assert isinstance(df_utils.df, pd.DataFrame)
+        assert not df_utils.df.empty
+
+    def test_initialization_with_csv_file(self, csv_file):
+        df_utils = DummyDF(data=str(csv_file))
+        assert isinstance(df_utils.df, pd.DataFrame)
+        assert not df_utils.df.empty
+
+    def test_initialization_with_invalid_data(self):
+        with pytest.raises(ValueError):
+            DummyDF(data=12345)
