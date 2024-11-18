@@ -1,16 +1,15 @@
-
 import pytest
 import pandas as pd
-from fakecopy.dummy import DummyDF
+from fakecopy.dummy import DummyDF, _create_test_dummy_data
 
 class TestSummarizeDataFrame:
     
     @pytest.fixture(scope="class")
     def df(self):
-        return DummyDF.create_dummy_data(seed=42)
+        return _create_test_dummy_data(seed=42)
     
     def test_summarize_dataframe(self, df):
-        df_utils = DummyDF(df=df)
+        df_utils = DummyDF(data=df)
         summary_df = df_utils.summary
         
         assert isinstance(summary_df, pd.DataFrame)
@@ -28,10 +27,10 @@ class TestGenerateDummyDataFromSummary:
     
     @pytest.fixture(scope="class")
     def df(self):
-        return DummyDF.create_dummy_data(seed=42)
+        return _create_test_dummy_data(seed=42)
     
     def test_generate_dummy_data_from_summary(self, df):
-        df_utils = DummyDF(df=df)
+        df_utils = DummyDF(data=df)
         summary_df = df_utils.summary
         dummy_df = df_utils.generate_dummy_data(n_rows=100)
         
