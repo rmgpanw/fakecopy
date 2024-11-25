@@ -8,18 +8,9 @@ class DummyDF:
     Attributes:
         summary (pd.DataFrame): A summary of the DataFrame.
 
-    Methods:
-        summarize_dataframe(df: pd.DataFrame) -> pd.DataFrame:
-            Summarizes the given DataFrame.
-        
+    Methods:        
         generate_dummy_data(n_rows: int = 100) -> pd.DataFrame:
             Generates dummy data based on the summary.
-        
-        save_summary_to_csv(filepath: str) -> None:
-            Saves the summary to a CSV file.
-
-        create_dummy_data(seed: int = None) -> pd.DataFrame:
-            Creates a dummy DataFrame with predefined columns and random data.
 
     Example usage:
         >>> df_data = pd.DataFrame({
@@ -58,36 +49,26 @@ class DummyDF:
         2  10.234567  C  7       True 2020-01-03
         3   9.765432  A  2      False 2020-01-04
         4  10.345678  B  6       True 2020-01-05
-
-        # Save summary to CSV
-        >>> df_dummy.save_summary_to_csv('summary.csv')
-
-        # Create dummy data using static method
-        >>> df_synthetic_static = DummyDF.create_dummy_data(seed=42)
-        >>> print(df_synthetic_static.head())
-           numeric categorical  integer  boolean       date
-        0      9.0           A        1     True 2020-01-01
-        1     11.0           B        2    False 2020-01-02
-        2     10.0           C        3     True 2020-01-03
-        3      8.0           A        4    False 2020-01-04
-        4     12.0           B        5     True 2020-01-05
     """
 
     def __init__(self, data, read_csv_args=None):
         if isinstance(data, str):
             if read_csv_args is None:
                 read_csv_args = {}
-            self.df = pd.read_csv(data, **read_csv_args)
+            raw_df = pd.read_csv(data, **read_csv_args)
         elif isinstance(data, pd.DataFrame):
             if read_csv_args is not None:
                 print("Warning: read_csv_args will be ignored as a DataFrame is provided.")
-            self.df = data
+            raw_df = data
         else:
             raise ValueError("data must be a file path (string) or a pandas DataFrame.")
         
-        self.summary = self.summarize_dataframe(self.df)
+        self.summary = self._summarize_dataframe(raw_df)
 
-    def summarize_dataframe(self, df: pd.DataFrame) -> pd.DataFrame:
+    def __str__(self):
+        return f"Summary:\n{self.summary.head()}"
+
+    def _summarize_dataframe(self, df: pd.DataFrame) -> pd.DataFrame:
         summary = []
         
         for column in df.columns:
@@ -180,9 +161,6 @@ class DummyDF:
 
         dummy_df = pd.DataFrame(dummy_data)
         return dummy_df
-
-    def save_summary_to_csv(self, filepath: str) -> None:
-        self.summary.to_csv(filepath, index=False)
 
 def _create_test_dummy_data(seed: int = None) -> pd.DataFrame:
     """

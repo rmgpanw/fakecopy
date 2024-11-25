@@ -23,6 +23,12 @@ class TestSummarizeDataFrame:
             assert row['dtype'] is not None
             assert 0 <= row['na_proportion'] <= 1
 
+    def test_str_representation(self, df):
+        df_utils = DummyDF(data=df)
+        str_repr = str(df_utils)
+        assert str_repr.startswith("Summary:")
+        assert "column" in str_repr
+
 class TestGenerateDummyDataFromSummary:
     
     @pytest.fixture(scope="class")
@@ -56,13 +62,13 @@ class TestDummyDFInitialization:
 
     def test_initialization_with_dataframe(self, df):
         df_utils = DummyDF(data=df)
-        assert isinstance(df_utils.df, pd.DataFrame)
-        assert not df_utils.df.empty
+        assert isinstance(df_utils.summary, pd.DataFrame)
+        assert not df_utils.summary.empty
 
     def test_initialization_with_csv_file(self, csv_file):
         df_utils = DummyDF(data=str(csv_file))
-        assert isinstance(df_utils.df, pd.DataFrame)
-        assert not df_utils.df.empty
+        assert isinstance(df_utils.summary, pd.DataFrame)
+        assert not df_utils.summary.empty
 
     def test_initialization_with_invalid_data(self):
         with pytest.raises(ValueError):
