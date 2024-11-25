@@ -125,9 +125,22 @@ class DummyDF:
             dtype = row['dtype']
             na_proportion = row['na_proportion']
             
-            if 'float' in dtype:
+            if 'datetime' in dtype:
+                min_date = pd.to_datetime(row['min']).date()
+                max_date = pd.to_datetime(row['max']).date()
+                min_ts = pd.Timestamp(min_date)
+                max_ts = pd.Timestamp(max_date)
+                random_dates = pd.to_datetime(
+                    np.random.randint(min_ts.value, max_ts.value, size=n_rows)
+                ).date
+                dummy_data[column] = random_dates
+            elif 'float' in dtype:
                 mean, std = row['mean'], row['std']
-                dummy_data[column] = np.random.normal(loc=mean, scale=std, size=n_rows)
+                min_val, max_val = row['min'], row['max']
+                dummy_data[column] = np.clip(
+                    np.random.normal(loc=mean, scale=std, size=n_rows),
+                    min_val, max_val
+                )
             
             elif 'int' in dtype:
                 mean, std = row['mean'], row['std']
@@ -139,17 +152,14 @@ class DummyDF:
                 if len(categories) > 100:
                     categories = categories[:100]
                 probabilities = list(row['frequencies'].values())
+                # Normalize probabilities to ensure they sum to 1
+                probabilities = np.array(probabilities)
+                probabilities = probabilities / probabilities.sum()
                 dummy_data[column] = np.random.choice(categories, size=n_rows, p=probabilities)
             
             elif 'bool' in dtype:
                 probabilities = row['frequencies']
                 dummy_data[column] = np.random.choice([True, False], size=n_rows, p=[probabilities.get(True, 0.5), probabilities.get(False, 0.5)])
-            
-            elif 'datetime' in dtype:
-                min_date, max_date = row['min'], row['max']
-                dummy_data[column] = pd.to_datetime(
-                    np.random.randint(min_date.value, max_date.value, size=n_rows)
-                )
             
             else:
                 unique_vals = row.get('unique_values', [0, 1])
@@ -180,7 +190,7 @@ def _create_test_dummy_data(seed: int = None) -> pd.DataFrame:
         'categorical': np.random.choice(['A', 'B', 'C'], 50),
         'integer': np.random.randint(1, 10, 50),
         'boolean': np.random.choice([True, False], 50),
-        'date': pd.date_range('2020-01-01', periods=50, freq='D')
+        'date': pd.date_range('2020-01-01', periods=50, freq='D').date
     })
     # Introduce some missing values for testing
     df.loc[df.sample(frac=0.2, random_state=seed).index, 'numeric'] = np.nan
